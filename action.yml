@@ -23,4 +23,5 @@ runs:
               repo: `${repo}`,
               run_id: `${repo}`
             })
-          console.log(JSON.stringify(response))
+          console.log(`Run Started at: ${response.data.run_started_at}``)
+          core.setOutput('run-start-time', response.data.run_started_at)
