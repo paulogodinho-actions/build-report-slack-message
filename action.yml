@@ -37,7 +37,7 @@ runs:
       uses: actions/github-script@v6
       with:
         script: |
-          required(${{ github.action_path }}/src/buildBlockKitMessage.js)
+          require(${{ github.action_path }}/src/buildBlockKitMessage.js)
 
     # - name: Build Block Kit Message Windows
     #   uses: actions/github-script@v6
