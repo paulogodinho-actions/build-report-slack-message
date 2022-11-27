@@ -59,7 +59,7 @@ runs:
       uses: actions/github-script@v6
       with:
         script: |
-          console.log(${{steps.build-message.outputs.AAAA}})
+          console.log("${{steps.build-message.outputs.AAAA}}")
 
     # - name: Build Block Kit Message Windows
     #   uses: actions/github-script@v6
