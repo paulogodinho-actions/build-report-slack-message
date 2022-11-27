@@ -1,8 +1,10 @@
 const fs = require('fs');
 
-// fs.appendFile('message.txt', 'data to append', function (err) {
+const outputFile = process.env.GITHUB_OUTPUT
+
+// fs.appendFile(outputFile, 'AAAA=BBBB', function (err) {
 //   if (err) throw err;
-//   console.log('Saved!');
+//   console.log('Added to output');
 // });
 
-console.log(process.env);
+console.log("Yep");

@@ -33,14 +33,21 @@ runs:
           const formatedTotalTime = `${hours}:${minutes}:${seconds}`
           console.log( `Total Run Time: ${formatedTotalTime}`)
           core.setOutput('total-run-time', formatedTotalTime)
+    - name: Test Stuff
+      uses: actions/github-script@v6
+      with:
+        script: |
+          required(${{ github.action_path }}/src/buildBlockKitMessage.js)
 
-    - name: Build Block Kit Message Windows
-      if: runner.os == 'Windows'
-      run: "node ${{ github.action_path }}/src/buildBlockKitMessage.js"
-      shell: pwsh
-    - name: Build Block Kit Message Unix
-      if: runner.os != 'Windows'
-      run: "node ${{ github.action_path }}/src/buildBlockKitMessage.js"
-      shell: bash
+    # - name: Build Block Kit Message Windows
+    #   uses: actions/github-script@v6
+    #   run: "node ${{ github.action_path }}/src/buildBlockKitMessage.js"
+    #   shell: pwsh
+    # - name: Build Block Kit Message Unix
+    #   if: runner.os != 'Windows'
+    #   run: "node ${{ github.action_path }}/src/buildBlockKitMessage.js"
+    #   shell: bash
+    
+    
     
     
