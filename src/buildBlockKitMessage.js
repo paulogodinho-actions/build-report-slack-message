@@ -1,5 +1,4 @@
 const fs = require('fs');
-fs = require('fs')
 
 
 const outputFile = process.env.GITHUB_OUTPUT
