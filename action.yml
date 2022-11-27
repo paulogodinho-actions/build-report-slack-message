@@ -33,3 +33,6 @@ runs:
           const formatedTotalTime = `${hours}:${minutes}:${seconds}`
           console.log( `Total Run Time: ${formatedTotalTime}`)
           core.setOutput('total-run-time', formatedTotalTime)
+
+    - name: Build Block Kit Message
+      run: "node ${{ github.action_path }}/src/buildBlockKitMessage.js"
