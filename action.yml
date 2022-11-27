@@ -1,0 +1,26 @@
+
+name: Send Build Report Slack Message
+author: Paulo Godinho
+description: >
+  Sends a Slack Message via Webhook with yout build results and info 
+inputs:
+  webhook-url:  # id of input
+    description: 'Webhook URL to send the message to'
+    required: false
+    default: ''
+runs:
+  using: composite
+  steps:
+    - name: Get Total Build Time
+      uses: actions/github-script@v6
+      with:
+        script: |
+          const owner = context.payload.repository.owner.login
+          const repo = context.payload.repository.name
+          const run_id = context.runId
+          const time = await github.request(`GET /repos/${owner}/${repo}/actions/runs/${run_id}/timing`, {
+              owner: `${owner}`,
+              repo: `${repo}`,
+              run_id: `${repo}`
+            })
+          console.log(JSON.stringify(time))
