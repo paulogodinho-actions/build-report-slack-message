@@ -34,5 +34,13 @@ runs:
           console.log( `Total Run Time: ${formatedTotalTime}`)
           core.setOutput('total-run-time', formatedTotalTime)
 
-    - name: Build Block Kit Message
+    - name: Build Block Kit Message Windows
+      if: runner.os == Windows
       run: "node ${{ github.action_path }}/src/buildBlockKitMessage.js"
+      shell: pwsh
+    - name: Build Block Kit Message Unix
+      if: runner.os != Windows
+      run: "node ${{ github.action_path }}/src/buildBlockKitMessage.js"
+      shell: bash
+    
+    
