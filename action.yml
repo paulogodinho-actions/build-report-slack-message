@@ -53,7 +53,7 @@ runs:
           }
           console.log(msgData)
           const msgDataJson = JSON.stringify(msgData)
-          await exec.exec('node', [${{ github.action_path }}/src/buildBlockKitMessage.js, msgDataJson])
+          await exec.exec('node', ['${{ github.action_path }}/src/buildBlockKitMessage.js', msgDataJson])
 
     - name: More Test
       uses: actions/github-script@v6
