@@ -12,7 +12,7 @@ fs.readFile(outputFile, 'utf8', function (err,data) {
   
 
 
-fs.appendFile(outputFile, 'AAAA=BBBB', function (err) {
+fs.appendFile(outputFile, '\nAAAA=BBBB\n', function (err) {
   if (err) throw err;
   console.log('Added to output');
 });
