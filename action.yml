@@ -12,6 +12,7 @@ runs:
   using: composite
   steps:
     - name: Get Total Build Time
+      id: get-total-time
       uses: actions/github-script@v6
       with:
         script: |
@@ -37,7 +38,20 @@ runs:
       uses: actions/github-script@v6
       with:
         script: |
-          require(${{ github.action_path }}/src/buildBlockKitMessage.js)
+          const os = require('os');
+
+          const msgData = {
+              title : `${context.workflow}`,
+              runUrl : `${context.payload.repository.html_url}/actions/runs/${context.runId}`,
+              buildNumber: `${context.runNumber}`,
+              branch: `${context.ref}`,
+              sha1: `${context.sha}`,
+              image: "https://placekitten.com/100/100",
+              machine: `${os.hostname()}`,
+              time: "${{steps.get-total-time.outputs.total-run-time}}"
+          }
+          console.log(msgData)
+    # await exec.exec(${{ github.action_path }}/src/buildBlockKitMessage.js)
 
     # - name: Build Block Kit Message Windows
     #   uses: actions/github-script@v6
