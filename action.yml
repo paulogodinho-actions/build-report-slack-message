@@ -34,7 +34,8 @@ runs:
           const formatedTotalTime = `${hours}:${minutes}:${seconds}`
           console.log( `Total Run Time: ${formatedTotalTime}`)
           core.setOutput('total-run-time', formatedTotalTime)
-    - name: Test Stuff
+    - name: Build Message
+      id: build-message
       uses: actions/github-script@v6
       with:
         script: |
@@ -51,7 +52,14 @@ runs:
               time: "${{steps.get-total-time.outputs.total-run-time}}"
           }
           console.log(msgData)
-    # await exec.exec(${{ github.action_path }}/src/buildBlockKitMessage.js)
+          const msgDataJson = JSON.stringify(msgData)
+          await exec.exec('node', [${{ github.action_path }}/src/buildBlockKitMessage.js, msgDataJson])
+
+    - name: More Test
+      uses: actions/github-script@v6
+      with:
+        script: |
+          console.log(${{steps.build-message.outputs.AAAA}})
 
     # - name: Build Block Kit Message Windows
     #   uses: actions/github-script@v6
