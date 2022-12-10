@@ -25,7 +25,7 @@ runs:
               run_id: `${repo}`
             })
 
-          await exec.exec('node', ['${{ github.action_path }}/src/getTotalRunTime.js', response])
+          await exec.exec('node', ['${{ github.action_path }}/src/getTotalRunTime.js', JSON.stringify(response)])
     - name: Build Message
       id: build-message
       uses: actions/github-script@v6

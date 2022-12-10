@@ -1,4 +1,4 @@
-const response = process.argv[2]
+const response = JSON.parse(process.argv[2])
 console.log(`Run Started at: ${response.data.run_started_at}`)
 const started = Date.parse(response.data.run_started_at);
 const utcNow = new Date().getTime();
