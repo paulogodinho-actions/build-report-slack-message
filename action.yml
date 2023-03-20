@@ -1,0 +1,133 @@
+
+name: Send Build Report Slack Message
+author: Paulo Godinho
+description: >
+  Sends a Slack Message via Webhook with yout build results and info 
+inputs:
+  webhook-url:
+    description: 'Webhook URL to send the message to'
+    required: false
+    default: ''
+  title:
+    description: 'Title of message'
+    required: false
+    default: ''
+  status:
+    description: 'Status of the job'
+    required: false
+    default: ''
+  branch:
+    description: 'Branch built'
+    required: false
+    default: '' 
+  sha:
+    description: 'Custom Sha'
+    required: false
+    default: ''
+  machine-name:
+    description: 'Machine that run the workflow'
+    required: false
+    default: ''
+  image:
+    description: 'Image to Use'
+    required: false
+    default: 'settings-5-fill'
+  extra-info:
+    description: 'Extra Info'
+    required: false
+    default: ''
+
+runs:
+  using: composite
+  steps:
+    - name: Get Total Build Time
+      id: get-total-time
+      uses: actions/github-script@v6
+      with:
+        script: |
+          const owner = context.payload.repository.owner.login
+          const repo = context.payload.repository.name
+          const run_id = context.runId
+          const response = await github.request(`GET /repos/${owner}/${repo}/actions/runs/${run_id}`, {
+              owner: `${owner}`,
+              repo: `${repo}`,
+              run_id: `${repo}`
+            })
+
+          await exec.exec('node', ['${{ github.action_path }}/src/getTotalRunTime.js', JSON.stringify(response)])
+    
+    - name: Build Message
+      id: build-message
+      uses: actions/github-script@v6
+      with:
+        script: |
+          const os = require('os');
+
+          let titleToDisplay = "${{ github.workflow }}"
+          if("${{ inputs.title || 'none' }}" != "none") {
+              titleToDisplay = "${{ inputs.title }}"
+          }
+
+          let shaToDisplay = `${context.sha}`
+          if("${{ inputs.sha || 'none' }}" != "none") {
+              shaToDisplay = "${{ inputs.sha }}"
+          }
+
+          let machineToDisplay = `${os.hostname()}`
+          if("${{ inputs.machine-name || 'none' }}" != "none") {
+            machineToDisplay = "${{ inputs.machine-name }}"
+          }
+
+          let branchToDisplay = `${context.ref}`
+          if("${{ inputs.branch || 'none' }}" != "none") {
+            branchToDisplay = "${{ inputs.branch }}"
+          }
+
+          let extraInfoToUse = ""
+          if("${{ inputs.extra-info || 'none' }}" != "none") {
+            extraInfoToUse = "${{ inputs.extra-info }}"
+          }
+
+          let jobStatus = "${{ job.status }}"
+          if("${{ inputs.status || 'none' }}" != "none") {
+            jobStatus = "${{ inputs.status }}"
+          }
+          const jobStatusAllCaps = jobStatus.toUpperCase()
+
+          let colorToUse = "blue"
+          switch(jobStatus) {
+            case "success":
+              colorToUse = "green"
+            break;
+            case "failure":
+              colorToUse = "red"
+            break;
+          }
+
+          const iconToUse = "${{ inputs.image }}"
+          const imageUrl = `https://github.com/paulogodinho-actions/build-status-icons/blob/main/remixicon-output/${iconToUse}_${colorToUse}.png?raw=true`
+
+          const msgData = {
+              title : `${titleToDisplay} | ${jobStatusAllCaps}` ,
+              runUrl : `${context.payload.repository.html_url}/actions/runs/${context.runId}`,
+              buildNumber: `${context.runNumber}`,
+              branch: `${branchToDisplay}`,
+              sha1: `${shaToDisplay}`.slice(0,8),
+              image: `${imageUrl}`,
+              machine: `${machineToDisplay}`,
+              time: "${{steps.get-total-time.outputs.total-run-time}}",
+              extraInfo: `${extraInfoToUse}`
+          }
+          console.log("--Message Data:--")
+          console.log(msgData)
+          const msgDataJson = JSON.stringify(msgData)
+          await exec.exec('node', ['${{ github.action_path }}/src/buildBlockKitMessage.js', msgDataJson])
+
+    - name: Send custom JSON data to Slack workflow
+      id: slack
+      uses: slackapi/slack-github-action@v1.23.0
+      with:
+        payload: ${{steps.build-message.outputs.SLACK_MSG}}
+      env:
+        SLACK_WEBHOOK_URL: ${{ inputs.webhook-url }}
+        SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
